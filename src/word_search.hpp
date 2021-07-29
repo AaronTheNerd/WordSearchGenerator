@@ -16,7 +16,7 @@
 namespace atn {
 
 // ============================================================================
-// ============================== Predefinitions ==============================
+// ================================ Definitions ===============================
 // ============================================================================
 
 template<size_t width, size_t height>
@@ -61,7 +61,8 @@ template<size_t width, size_t height>
 class word_search {
   private:
     static int _rand(int);
-    static bool _comp(std::pair<std::string, bool>&, std::pair<std::string, bool>&);
+    static bool _comp(
+            std::pair<std::string, bool>&, std::pair<std::string, bool>&);
     static std::string to_upper(std::string);
     static bool check_word(
             board<width, height>, std::string, direction<width, height>, pos);
@@ -77,12 +78,13 @@ class word_search {
     int seed;
     std::vector<std::string> word_bank;
     board<width, height> puzzle;
+    board<width, height> solution;
     explicit word_search(int, std::vector<std::string>);
     std::string to_string() const;
 };
 
 // ============================================================================
-// ================================ Definitions ===============================
+// =============================== Declarations ===============================
 // ============================================================================
 
 template<size_t width, size_t height>
@@ -118,8 +120,11 @@ bool word_search<width, height>::check_word(
         std::string word,
         direction<width, height> dir,
         pos p) {
-    for (size_t i = 0, x_curr = p.x, y_curr = p.y; i < word.size(); ++i, x_curr += dir.dx, y_curr += dir.dy) {
-        if (puzzle[x_curr][y_curr] != EMPTY_CHAR && puzzle[x_curr][y_curr] != word[i]) {
+    for (size_t i = 0, x_curr = p.x, y_curr = p.y;
+            i < word.size();
+            ++i, x_curr += dir.dx, y_curr += dir.dy) {
+        if (puzzle[x_curr][y_curr] != EMPTY_CHAR
+                && puzzle[x_curr][y_curr] != word[i]) {
             return false;
         }
     }
@@ -155,7 +160,9 @@ board<width, height> word_search<width, height>::place_word(
         board<width, height> puzzle, std::string word,
         direction<width, height> dir,
         pos p) {
-    for (size_t i = 0, x_curr = p.x, y_curr = p.y; i < word.size(); ++i, x_curr += dir.dx, y_curr += dir.dy) {
+    for (size_t i = 0, x_curr = p.x, y_curr = p.y;
+            i < word.size();
+            ++i, x_curr += dir.dx, y_curr += dir.dy) {
         puzzle[x_curr][y_curr] = word[i];
     }
     return puzzle;
@@ -166,7 +173,8 @@ board<width, height> word_search<width, height>::place_word(
 // Recursive method for generating a word search
 template<size_t width, size_t height>
 std::pair<bool, board<width, height>> word_search<width, height>::generate_word_search(
-        board<width, height> puzzle, std::vector<std::pair<std::string, bool>> placed_words) {
+        board<width, height> puzzle,
+        std::vector<std::pair<std::string, bool>> placed_words) {
     bool all_words_placed = true;
     for (auto word_pair : placed_words) {
         all_words_placed &= word_pair.second;
@@ -210,7 +218,8 @@ void word_search<width, height>::check_word_lengths() const {
     size_t min_bound = std::min(width, height);
     for (auto str : this->word_bank) {
         if (str.size() > min_bound)
-            throw std::runtime_error("ERROR: Words cannot be larger than the size of the puzzle");
+            throw std::runtime_error(
+                    "ERROR: Words cannot be larger than the size of the puzzle");
     }
 }
 
@@ -232,8 +241,9 @@ void word_search<width, height>::fill_empty_spots() {
 
 // Constructor
 template<size_t width, size_t height>
-word_search<width, height>::word_search(int seed, std::vector<std::string> word_bank)
-        : seed(seed), word_bank(word_bank), puzzle() {
+word_search<width, height>::word_search(
+        int seed, std::vector<std::string> word_bank)
+        : seed(seed), word_bank(word_bank), puzzle(), solution() {
     srand(seed);
     for (size_t i = 0; i < this->word_bank.size(); ++i) {
         this->word_bank[i] = word_search<width, height>::to_upper(
@@ -245,13 +255,16 @@ word_search<width, height>::word_search(int seed, std::vector<std::string> word_
     for (auto str : this->word_bank) {
         placed_words.emplace_back(std::make_pair(str, false));
     }
-    std::sort(placed_words.begin(), placed_words.end(), word_search<width, height>::_comp);
+    std::sort(placed_words.begin(),
+            placed_words.end(),
+            word_search<width, height>::_comp);
     auto result = word_search<width, height>::generate_word_search(
             this->puzzle, placed_words); // Place words in puzzle
     if (!result.first) {
         throw std::runtime_error("ERROR: No valid puzzles found.");
     }
     this->puzzle = result.second;
+    this->solution = this->puzzle;
     this->fill_empty_spots(); // Fill in empty slots
 }
 
@@ -272,7 +285,14 @@ std::string word_search<width, height>::to_string() const {
     for (auto word : this->word_bank) {
         str += (word + "\n");
     }
-    str += ("\nSeed: " + std::to_string(this->seed));
+    str += ("\nSeed: " + std::to_string(this->seed) + "\n\n");
+    str += "Sloution: \n";
+    for (size_t x = 0; x < width; ++x) {
+        for (size_t y = 0; y < height; ++y) {
+            str += (this->solution[x][y] == EMPTY_CHAR ? ' ' : this->solution[x][y]);
+        }
+        str += "\n";
+    }
     return str;
 }
 
