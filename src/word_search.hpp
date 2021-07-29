@@ -90,8 +90,12 @@ int word_search<width, height>::_rand(int i) {
     return rand() % i;
 }
 
+// ============================================================================
+
 template<size_t width, size_t height>
-bool word_search<width, height>::_comp(std::pair<std::string, bool>& str1, std::pair<std::string, bool>& str2) {
+bool word_search<width, height>::_comp(
+        std::pair<std::string, bool>& str1,
+        std::pair<std::string, bool>& str2) {
     return str1.first.size() > str2.first.size();
 }
 
