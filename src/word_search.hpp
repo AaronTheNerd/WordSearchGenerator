@@ -1,5 +1,7 @@
+// ============================================================================
 // Written by Aaron Barge
 // Copyright 2021
+// ============================================================================
 
 #ifndef _WORDSEARCHGENERATOR_WORD_SEARCH_HPP_
 #define _WORDSEARCHGENERATOR_WORD_SEARCH_HPP_
