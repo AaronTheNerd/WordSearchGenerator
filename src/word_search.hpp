@@ -12,6 +12,7 @@
 #include <vector>
 
 #define EMPTY_CHAR '\0'
+#define MIN_WORD_LENGTH 3
 
 namespace atn {
 
@@ -197,10 +198,12 @@ std::pair<bool, board<width, height>> word_search<width, height>::generate_word_
             for (pos p : poses) {
                 auto placed_words_copy = placed_words;
                 board<width, height> new_puzzle = 
-                        word_search<width, height>::place_word(puzzle, word, dir, p);
+                        word_search<width, height>::place_word(
+                                puzzle, word, dir, p);
                 placed_words_copy[i].second = true;
-                auto puzzle_pair = word_search<width, height>::generate_word_search(
-                        new_puzzle, placed_words_copy);
+                auto puzzle_pair = 
+                        word_search<width, height>::generate_word_search(
+                                new_puzzle, placed_words_copy);
                 if (puzzle_pair.first) {
                     return puzzle_pair;
                 }
@@ -217,7 +220,7 @@ template<size_t width, size_t height>
 void word_search<width, height>::check_word_lengths() const {
     size_t min_bound = std::min(width, height);
     for (auto str : this->word_bank) {
-        if (str.size() > min_bound)
+        if (str.size() >= MIN_WORD_LENGTH && str.size() > min_bound)
             throw std::runtime_error(
                     "ERROR: Words cannot be larger than the size of the puzzle");
     }
@@ -289,7 +292,8 @@ std::string word_search<width, height>::to_string() const {
     str += "Sloution: \n";
     for (size_t x = 0; x < width; ++x) {
         for (size_t y = 0; y < height; ++y) {
-            str += (this->solution[x][y] == EMPTY_CHAR ? ' ' : this->solution[x][y]);
+            str += (this->solution[x][y] == EMPTY_CHAR ?
+                    ' ' : this->solution[x][y]);
         }
         str += "\n";
     }
