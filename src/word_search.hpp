@@ -1,6 +1,6 @@
 // ============================================================================
-// Written by Aaron Barge
-// Copyright 2021
+// ========================== Written by Aaron Barge ==========================
+// ============================== Copyright 2021 ==============================
 // ============================================================================
 
 #ifndef _WORDSEARCHGENERATOR_WORD_SEARCH_HPP_
@@ -89,6 +89,7 @@ class word_search {
     board<width, height> puzzle;
     board<width, height> solution;
     explicit word_search(int, std::vector<std::string>);
+    char at(const pos&) const;
     bool check_selection(const pos&, const pos&);
     std::string to_string() const;
 };
@@ -319,6 +320,13 @@ word_search<width, height>::word_search(
     this->puzzle = result.second;
     this->solution = this->puzzle;
     this->fill_empty_spots(); // Fill in empty slots
+}
+
+// ============================================================================
+
+template<size_t width, size_t height>
+char word_search<width, height>::at(const pos& p) const {
+    return this->puzzle[p.x][p.y];
 }
 
 // ============================================================================

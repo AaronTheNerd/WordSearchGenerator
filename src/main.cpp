@@ -8,7 +8,7 @@ int main(int argc, char** argv) {
     if (argc > 1) {
         seed = atoi(argv[1]);
     }
-    std::vector<std::string> word_bank = {"cpp", "car", "cup"};
-    atn::word_search<3, 3> puzzle(seed, word_bank);
+    std::vector<std::string> word_bank = {"BOOLEAN", "BREAK", "CHAR", "CLASS", "DOUBLE", "FORLOOP", "INTEGER", "OBJECTS", "RANDOM", "RECURSION", "RETURN", "STRING", "STRUCT", "UNSIGNED", "WHILELOOP"};
+    atn::word_search<15, 15> puzzle(seed, word_bank);
     std::cout << puzzle.to_string() << std::endl;
 }
