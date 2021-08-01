@@ -1,33 +1,33 @@
 Puzzle:
-T D Q H P C C D F K J I F U A 
+Q M P P O O L E L I H W O Q E 
 
-C P E C B O K L T I N W O L Y 
+O R A N D O M H M T N C H R Q 
 
-U L Z W C Y O A A T B Y T W Y 
+C Z F N C S T R U C T L F W O 
 
-R H O N M G C L E S D V P G W 
+H B C X Q P R E C U R S I O N 
 
-T X Q V Y Q K G E R S J T V W 
+A S S P I A S S D P A I J R A 
 
-S T E D A V E L N L B P O H T 
+R D T E Z S R E N A P Y W D L 
 
-O V Z V E R L U N S I G N E D 
+B W I C A X N T A E C S F Z E 
 
-N A E L O O B S R J H H E Z F 
+F Y O L E G B A E S C C P U I 
 
-P S N Y V V P K R T W A W I N 
+B O C L I J B Z L T O R N O Q 
 
-F O V U S D O U B L E A N T V 
+O X R S M N B G O R S V U K D 
 
-G U O G N O I S R U C E R A I 
+W M N L R O Z O O I C C Q U O 
 
-R Y N L K G F R P S T R I N G 
+B U V U O X D Z B N Z Z C J U 
 
-R E T U R N R A Y M O D N A R 
+V D T S W O V Q L G K U Z M B 
 
-F S O F U O K H S T C E J B O 
+U E T H Y L P I N T E G E R L 
 
-I X R S H P F C O L L B I N O 
+R B F K A E R B K O D U U N E 
 
 Word Bank:
 BOOLEAN
@@ -46,26 +46,22 @@ STRUCT
 UNSIGNED
 WHILELOOP
 
-Seed: 1244656416
+Seed: 522885963
 
 Sloution: 
-T   P C    I   
-C    OKL  N    
-U     OAAT     
-R      LES     
-T      GERS    
-S     E  LB    
-     R UNSIGNED
-NAELOOB    H   
-P           W  
- O   DOUBLE    
-  O NOISRUCER  
-   L   R STRING
-RETURN A MODNAR
-     O HSTCEJBO
-      FC       
+   POOLELIHW   
+ RANDOM        
+C    STRUCT    
+H     RECURSION
+AS    S D      
+R T  S EN      
+   CA N A      
+F  LEG  ES     
+ OC IJ  LT     
+  RS NB OR    D
+  NLR  OOI    O
+ U UO   BN    U
+  T  O   G    B
+ E    PINTEGERL
+R  KAERB      E
 
-T
-I
-A
-O

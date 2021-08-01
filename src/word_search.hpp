@@ -29,6 +29,8 @@ using board = std::array<std::array<char, height>, width>;
 struct pos {
     size_t x;
     size_t y;
+
+    pos(size_t x, size_t y) : x(x), y(y) {}
 };
 
 template<size_t width, size_t height>
@@ -397,6 +399,16 @@ std::string word_search<width, height>::to_string() const {
     }
     return str;
 }
+
+// ============================================================================
+
+/*NOTE: This would be a good way to create different difficulties of puzzles*/
+
+class standard_word_search : public word_search<15, 15> {
+  public:
+    explicit standard_word_search(int seed, std::vector<std::string> word_bank)
+            : word_search<15, 15>(seed, word_bank) {}
+};
 
 }; // End namespace atn
 
