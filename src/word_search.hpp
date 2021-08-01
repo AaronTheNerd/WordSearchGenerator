@@ -83,14 +83,17 @@ class word_search {
     static std::vector<std::string> to_upper(std::vector<std::string>);
     void fill_empty_spots();
     std::string get_word(const pos&, const pos&) const;
+    void check_won();
   public:
     int seed;
     std::vector<std::pair<std::string, bool>> word_bank;
     board<width, height> puzzle;
     board<width, height> solution;
+    bool won;
     explicit word_search(int, std::vector<std::string>);
     char at(const pos&) const;
     bool check_selection(const pos&, const pos&);
+    bool get_won() const;
     std::string to_string() const;
 };
 
@@ -294,11 +297,22 @@ std::string word_search<width, height>::get_word(
 
 // ============================================================================
 
+template<size_t width, size_t height>
+void word_search<width, height>::check_won() {
+    bool res = true;
+    for (std::pair<std::string, bool> word_found_pair : this->word_bank) {
+        res &= word_found_pair.second;
+    }
+    this->won = res;
+}
+
+// ============================================================================
+
 // Constructor
 template<size_t width, size_t height>
 word_search<width, height>::word_search(
         int seed, std::vector<std::string> word_bank)
-        : seed(seed), word_bank(), puzzle(), solution() {
+        : seed(seed), word_bank(), puzzle(), solution(), won(false) {
     srand(seed);
     word_bank = this->remove_duplicates(word_bank); // Remove duplicates
     this->check_word_lengths(word_bank); // Check word lengths
@@ -342,10 +356,18 @@ bool word_search<width, height>::check_selection(
                 || this->word_bank[i].first == rev_selected_word)
                 && !this->word_bank[i].second) {
             this->word_bank[i].second = true;
+            this->check_won();
             return true;
         }
     }
     return false;
+}
+
+// ============================================================================
+
+template<size_t width, size_t height>
+bool word_search<width, height>::get_won() const {
+    return this->won;
 }
 
 // ============================================================================
