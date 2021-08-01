@@ -78,8 +78,7 @@ class word_search {
             board<width, height>, std::vector<std::pair<std::string, bool>>);
     static std::vector<std::string> remove_duplicates(
             std::vector<std::string>);
-    static void check_word_lengths(
-            std::vector<std::string>);
+    static void check_word_lengths(std::vector<std::string>);
     static std::vector<std::string> to_upper(std::vector<std::string>);
     void fill_empty_spots();
     std::string get_word(const pos&, const pos&) const;
@@ -354,7 +353,7 @@ bool word_search<width, height>::check_selection(
     for (size_t i = 0; i < this->word_bank.size(); ++i) {
         if ((this->word_bank[i].first == selected_word
                 || this->word_bank[i].first == rev_selected_word)
-                && !this->word_bank[i].second) {
+                && !this->word_bank[i].second) { // This is a redundant check to ensure that if duplicates are in the word search they can all be found
             this->word_bank[i].second = true;
             this->check_won();
             return true;
