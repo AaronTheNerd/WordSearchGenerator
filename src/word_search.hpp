@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <array>
 #include <cstdlib>
+#include <set>
 #include <string>
 #include <utility>
 #include <vector>
@@ -75,14 +76,20 @@ class word_search {
             board<width, height>, std::string, direction<width, height>, pos);
     static std::pair<bool, board<width, height>> generate_word_search(
             board<width, height>, std::vector<std::pair<std::string, bool>>);
-    void check_word_lengths() const;
+    static std::vector<std::string> remove_duplicates(
+            std::vector<std::string>);
+    static void check_word_lengths(
+            std::vector<std::string>);
+    static std::vector<std::string> to_upper(std::vector<std::string>);
     void fill_empty_spots();
+    std::string get_word(const pos&, const pos&) const;
   public:
     int seed;
-    std::vector<std::string> word_bank;
+    std::vector<std::pair<std::string, bool>> word_bank;
     board<width, height> puzzle;
     board<width, height> solution;
     explicit word_search(int, std::vector<std::string>);
+    bool check_selection(const pos&, const pos&);
     std::string to_string() const;
 };
 
@@ -217,11 +224,32 @@ std::pair<bool, board<width, height>> word_search<width, height>::generate_word_
 
 // ============================================================================
 
+template<size_t width, size_t height>
+std::vector<std::string> word_search<width, height>::remove_duplicates(
+        std::vector<std::string> word_bank) {
+    std::set<std::string> s(word_bank.begin(), word_bank.end());
+    return std::vector<std::string>(s.begin(), s.end());
+}
+
+// ============================================================================
+
+template<size_t width, size_t height>
+std::vector<std::string> word_search<width, height>::to_upper(
+        std::vector<std::string> word_bank) {
+    for (size_t i = 0; i < word_bank.size(); ++i) {
+        word_bank[i] = word_search<width, height>::to_upper(word_bank[i]);
+    }
+    return word_bank;
+}
+
+// ============================================================================
+
 // Checks all words to be less than the minimum dimension
 template<size_t width, size_t height>
-void word_search<width, height>::check_word_lengths() const {
+void word_search<width, height>::check_word_lengths(
+        std::vector<std::string> word_bank) {
     size_t min_bound = std::min(width, height);
-    for (auto str : this->word_bank) {
+    for (auto str : word_bank) {
         if (str.size() >= MIN_WORD_LENGTH && str.size() > min_bound)
             throw std::runtime_error(
                     "ERROR: Words cannot be larger than the size of the puzzle");
@@ -244,22 +272,42 @@ void word_search<width, height>::fill_empty_spots() {
 
 // ============================================================================
 
+template<size_t width, size_t height>
+std::string word_search<width, height>::get_word(
+    const pos& p1, const pos& p2) const {
+    int dx = p2.x - p1.x;
+    int dy = p2.y - p1.y;
+    if (dx != 0) {
+        dx /= abs(dx);
+    }
+    if (dy != 0) {
+        dy /= abs(dy);
+    }
+    std::string ret;
+    for (pos p = p1; p.x != p2.x || p.y != p2.y; p.x += dx, p.y += dy) {
+        ret += this->puzzle[p.x][p.y];
+    }
+    ret += this->puzzle[p2.x][p2.y];
+    return ret;
+}
+
+// ============================================================================
+
 // Constructor
 template<size_t width, size_t height>
 word_search<width, height>::word_search(
         int seed, std::vector<std::string> word_bank)
-        : seed(seed), word_bank(word_bank), puzzle(), solution() {
+        : seed(seed), word_bank(), puzzle(), solution() {
     srand(seed);
-    for (size_t i = 0; i < this->word_bank.size(); ++i) {
-        this->word_bank[i] = word_search<width, height>::to_upper(
-                this->word_bank[i]);
-    }
-    this->check_word_lengths(); // Check word lengths
+    word_bank = this->remove_duplicates(word_bank); // Remove duplicates
+    this->check_word_lengths(word_bank); // Check word lengths
+    word_bank = this->to_upper(word_bank); // Convert strings to uppercase
     this->puzzle.fill({}); // Initialize blank puzzle
     std::vector<std::pair<std::string, bool>> placed_words;
-    for (auto str : this->word_bank) {
+    for (auto str : word_bank) {
         placed_words.emplace_back(std::make_pair(str, false));
     }
+    this->word_bank = placed_words;
     std::sort(placed_words.begin(),
             placed_words.end(),
             word_search<width, height>::_comp);
@@ -275,25 +323,44 @@ word_search<width, height>::word_search(
 
 // ============================================================================
 
+template<size_t width, size_t height>
+bool word_search<width, height>::check_selection(
+        const pos& p1, const pos& p2) {
+    std::string selected_word = word_search<width, height>::get_word(p1, p2);
+    std::string rev_selected_word(
+            selected_word.rbegin(), selected_word.rend());
+    for (size_t i = 0; i < this->word_bank.size(); ++i) {
+        if ((this->word_bank[i].first == selected_word
+                || this->word_bank[i].first == rev_selected_word)
+                && !this->word_bank[i].second) {
+            this->word_bank[i].second = true;
+            return true;
+        }
+    }
+    return false;
+}
+
+// ============================================================================
+
 // Simple to_string
 template<size_t width, size_t height>
 std::string word_search<width, height>::to_string() const {
     std::string str;
     str += "Puzzle:\n";
-    for (size_t x = 0; x < width; ++x) {
-        for (size_t y = 0; y < height; ++y) {
+    for (size_t y = 0; y < height; ++y) {
+        for (size_t x = 0; x < width; ++x) {
             str += (this->puzzle[x][y] + std::string(" "));
         }
         str += "\n\n";
     }
     str += "Word Bank:\n";
     for (auto word : this->word_bank) {
-        str += (word + "\n");
+        str += (word.first + "\n");
     }
     str += ("\nSeed: " + std::to_string(this->seed) + "\n\n");
     str += "Sloution: \n";
-    for (size_t x = 0; x < width; ++x) {
-        for (size_t y = 0; y < height; ++y) {
+    for (size_t y = 0; y < height; ++y) {
+        for (size_t x = 0; x < width; ++x) {
             str += (this->solution[x][y] == EMPTY_CHAR ?
                     ' ' : this->solution[x][y]);
         }

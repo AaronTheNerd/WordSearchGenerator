@@ -1,0 +1,67 @@
+Puzzle:
+T I N T E G E R Z K T R A X O 
+
+S B T N J R O I U L R J E F J 
+
+K S A O C B B B Z R M Q U R D 
+
+P K D M Y X R N J O R L Y K V 
+
+U R Y N F C S E D E S O N N M 
+
+Q D E O U C G N A T C O K Z Z 
+
+W N O T J S A F R K I T D D J 
+
+H S S C U R B I O S D E S R S 
+
+I N Y C N R N O R R N N N T T 
+
+L R I J H G N U O G L G U A R 
+
+E J L W O A C T I L G O N S U 
+
+L W D D O E R S G M E G O Z C 
+
+O O L S R D N M F Q B A Y P T 
+
+O I J I O U E S S A L C N K A 
+
+P R G O E L B U O D K O D C K 
+
+Word Bank:
+BOOLEAN
+BREAK
+CHAR
+CLASS
+DOUBLE
+FORLOOP
+INTEGER
+OBJECTS
+RANDOM
+RECURSION
+RETURN
+STRING
+STRUCT
+UNSIGNED
+WHILELOOP
+
+Seed: 1044500659
+
+Sloution: 
+ INTEGER       
+      O        
+     B B  M    
+      R JO     
+ R     EDES N  
+  E    NATCO   
+W  T  AFRKITD  
+H   URBIOS ES S
+I  C RNORRN   T
+L   HGNUOGL   R
+E    AC IL O  U
+L    ERS  E O C
+O   R N    A PT
+O    U SSALCN  
+P   ELBUOD     
+
