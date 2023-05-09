@@ -1,67 +1,367 @@
-Puzzle:
-Q M P P O O L E L I H W O Q E 
+puzzle: string[][] = [
+  ["C", "B", "B", "A", "C", "C", "O", "U", "N", "T", "A", "B", "L", "E", "L"],
+  ["D", "R", "E", "P", "B", "P", "R", "O", "D", "U", "C", "T", "I", "V", "E"],
+  ["B", "E", "I", "S", "R", "A", "D", "E", "D", "I", "C", "A", "T", "E", "D"],
+  ["F", "M", "T", "T", "T", "O", "L", "F", "L", "C", "N", "I", "C", "E", "I"],
+  ["A", "O", "D", "A", "I", "C", "F", "D", "U", "I", "O", "G", "H", "P", "N"],
+  ["S", "T", "E", "E", "I", "C", "A", "E", "G", "N", "A", "O", "I", "A", "N"],
+  ["T", "I", "V", "H", "T", "L", "A", "N", "S", "S", "N", "B", "L", "T", "O"],
+  ["L", "V", "E", "O", "I", "E", "O", "L", "D", "S", "M", "Y", "L", "I", "V"],
+  ["E", "A", "L", "N", "C", "R", "R", "R", "T", "I", "I", "A", "Q", "E", "A"],
+  ["A", "T", "O", "E", "T", "O", "E", "M", "I", "H", "D", "O", "R", "N", "T"],
+  ["R", "E", "P", "S", "X", "M", "O", "M", "I", "E", "I", "A", "N", "T", "O"],
+  ["N", "D", "E", "T", "A", "L", "L", "K", "E", "N", "N", "N", "T", "A", "R"],
+  ["E", "O", "R", "G", "A", "N", "I", "Z", "E", "D", "E", "T", "K", "E", "L"],
+  ["R", "O", "P", "E", "N", "M", "I", "N", "D", "E", "D", "D", "E", "E", "S"],
+  ["P", "R", "O", "B", "L", "E", "M", "S", "O", "L", "V", "E", "R", "D", "R"],
+];
 
-O R A N D O M H M T N C H R Q 
-
-C Z F N C S T R U C T L F W O 
-
-H B C X Q P R E C U R S I O N 
-
-A S S P I A S S D P A I J R A 
-
-R D T E Z S R E N A P Y W D L 
-
-B W I C A X N T A E C S F Z E 
-
-F Y O L E G B A E S C C P U I 
-
-B O C L I J B Z L T O R N O Q 
-
-O X R S M N B G O R S V U K D 
-
-W M N L R O Z O O I C C Q U O 
-
-B U V U O X D Z B N Z Z C J U 
-
-V D T S W O V Q L G K U Z M B 
-
-U E T H Y L P I N T E G E R L 
-
-R B F K A E R B K O D U U N E 
-
-Word Bank:
-BOOLEAN
-BREAK
-CHAR
-CLASS
-DOUBLE
-FORLOOP
-INTEGER
-OBJECTS
-RANDOM
-RECURSION
-RETURN
-STRING
-STRUCT
-UNSIGNED
-WHILELOOP
-
-Seed: 522885963
-
-Sloution: 
-   POOLELIHW   
- RANDOM        
-C    STRUCT    
-H     RECURSION
-AS    S D      
-R T  S EN      
-   CA N A      
-F  LEG  ES     
- OC IJ  LT     
-  RS NB OR    D
-  NLR  OOI    O
- U UO   BN    U
-  T  O   G    B
- E    PINTEGERL
-R  KAERB      E
-
+answers: IAnswer[] = [  {
+    answer: "CRITICALTHINKER",
+    found: false,
+    start: {
+      x: 0,
+      y: 0
+    },
+    end: {
+      x: 14,
+      y: 14
+    }
+  },
+  {
+    answer: "DETAILORIENTED",
+    found: false,
+    start: {
+      x: 0,
+      y: 1
+    },
+    end: {
+      x: 13,
+      y: 14
+    }
+  },
+  {
+    answer: "BESTCANDIDATE",
+    found: false,
+    start: {
+      x: 1,
+      y: 0
+    },
+    end: {
+      x: 13,
+      y: 12
+    }
+  },
+  {
+    answer: "PROBLEMSOLVER",
+    found: false,
+    start: {
+      x: 0,
+      y: 14
+    },
+    end: {
+      x: 12,
+      y: 14
+    }
+  },
+  {
+    answer: "PROFESSIONAL",
+    found: false,
+    start: {
+      x: 3,
+      y: 1
+    },
+    end: {
+      x: 14,
+      y: 12
+    }
+  },
+  {
+    answer: "ACCOUNTABLE",
+    found: false,
+    start: {
+      x: 3,
+      y: 0
+    },
+    end: {
+      x: 13,
+      y: 0
+    }
+  },
+  {
+    answer: "FASTLEARNER",
+    found: false,
+    start: {
+      x: 0,
+      y: 3
+    },
+    end: {
+      x: 0,
+      y: 13
+    }
+  },
+  {
+    answer: "DETERMINED",
+    found: false,
+    start: {
+      x: 2,
+      y: 4
+    },
+    end: {
+      x: 11,
+      y: 13
+    }
+  },
+  {
+    answer: "PRODUCTIVE",
+    found: false,
+    start: {
+      x: 5,
+      y: 1
+    },
+    end: {
+      x: 14,
+      y: 1
+    }
+  },
+  {
+    answer: "OPENMINDED",
+    found: false,
+    start: {
+      x: 1,
+      y: 13
+    },
+    end: {
+      x: 10,
+      y: 13
+    }
+  },
+  {
+    answer: "DEDICATED",
+    found: false,
+    start: {
+      x: 6,
+      y: 2
+    },
+    end: {
+      x: 14,
+      y: 2
+    }
+  },
+  {
+    answer: "DEVELOPER",
+    found: false,
+    start: {
+      x: 2,
+      y: 4
+    },
+    end: {
+      x: 2,
+      y: 12
+    }
+  },
+  {
+    answer: "INNOVATOR",
+    found: false,
+    start: {
+      x: 14,
+      y: 3
+    },
+    end: {
+      x: 14,
+      y: 11
+    }
+  },
+  {
+    answer: "MOTIVATED",
+    found: false,
+    start: {
+      x: 1,
+      y: 3
+    },
+    end: {
+      x: 1,
+      y: 11
+    }
+  },
+  {
+    answer: "ORGANIZED",
+    found: false,
+    start: {
+      x: 1,
+      y: 12
+    },
+    end: {
+      x: 9,
+      y: 12
+    }
+  },
+  {
+    answer: "RELIABLE",
+    found: false,
+    start: {
+      x: 6,
+      y: 1
+    },
+    end: {
+      x: 13,
+      y: 8
+    }
+  },
+  {
+    answer: "PATIENT",
+    found: false,
+    start: {
+      x: 13,
+      y: 4
+    },
+    end: {
+      x: 13,
+      y: 10
+    }
+  },
+  {
+    answer: "STRONG",
+    found: false,
+    start: {
+      x: 3,
+      y: 10
+    },
+    end: {
+      x: 8,
+      y: 5
+    }
+  },
+  {
+    answer: "HIREME",
+    found: false,
+    start: {
+      x: 3,
+      y: 6
+    },
+    end: {
+      x: 8,
+      y: 11
+    }
+  },
+  {
+    answer: "HONEST",
+    found: false,
+    start: {
+      x: 3,
+      y: 6
+    },
+    end: {
+      x: 3,
+      y: 11
+    }
+  },
+  {
+    answer: "SMART",
+    found: false,
+    start: {
+      x: 9,
+      y: 6
+    },
+    end: {
+      x: 13,
+      y: 10
+    }
+  },
+  {
+    answer: "CHILL",
+    found: false,
+    start: {
+      x: 12,
+      y: 3
+    },
+    end: {
+      x: 12,
+      y: 7
+    }
+  },
+  {
+    answer: "GAMER",
+    found: false,
+    start: {
+      x: 3,
+      y: 12
+    },
+    end: {
+      x: 7,
+      y: 8
+    }
+  },
+  {
+    answer: "FUNNY",
+    found: false,
+    start: {
+      x: 7,
+      y: 3
+    },
+    end: {
+      x: 11,
+      y: 7
+    }
+  },
+  {
+    answer: "TALL",
+    found: false,
+    start: {
+      x: 3,
+      y: 11
+    },
+    end: {
+      x: 6,
+      y: 11
+    }
+  },
+  {
+    answer: "NICE",
+    found: false,
+    start: {
+      x: 10,
+      y: 3
+    },
+    end: {
+      x: 13,
+      y: 3
+    }
+  },
+  {
+    answer: "COOL",
+    found: false,
+    start: {
+      x: 9,
+      y: 3
+    },
+    end: {
+      x: 12,
+      y: 6
+    }
+  },
+  {
+    answer: "COOK",
+    found: false,
+    start: {
+      x: 4,
+      y: 8
+    },
+    end: {
+      x: 7,
+      y: 11
+    }
+  },
+  {
+    answer: "BALD",
+    found: false,
+    start: {
+      x: 4,
+      y: 1
+    },
+    end: {
+      x: 7,
+      y: 4
+    }
+  },
+];

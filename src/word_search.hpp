@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <array>
 #include <cstdlib>
+#include <iostream>
 #include <set>
 #include <string>
 #include <utility>
@@ -52,15 +53,39 @@ struct direction {
 };
 
 template<size_t width, size_t height>
+struct dir_and_pos {
+    atn::direction<width, height> dir;
+    atn::pos p;
+};
+
+template<size_t width, size_t height>
 std::vector<direction<width, height>> directions = {
+/*
     direction<width, height> {-1, -1},
     direction<width, height> {-1, 0},
     direction<width, height> {-1, 1},
     direction<width, height> {0, -1},
+    */
     direction<width, height> {0, 1},
     direction<width, height> {1, -1},
     direction<width, height> {1, 0},
     direction<width, height> {1, 1}
+};
+
+struct placed_word {
+    std::string word;
+    bool placed;
+    size_t start_x;
+    size_t start_y;
+    size_t end_x;
+    size_t end_y;
+};
+
+template<size_t width, size_t height>
+struct generate_result {
+    bool success;
+    board<width, height> puzzle;
+    std::vector<atn::placed_word> placed_words;
 };
 
 template<size_t width, size_t height>
@@ -68,34 +93,29 @@ class word_search {
   private:
     static int _rand(int);
     static bool _comp(
-            std::pair<std::string, bool>&, std::pair<std::string, bool>&);
+            atn::placed_word&, atn::placed_word&);
     static std::string to_upper(std::string);
     static bool check_word(
             board<width, height>, std::string, direction<width, height>, pos);
-    static std::vector<pos> find_places_for_word(
-            board<width, height>, std::string, direction<width, height>);
-    static board<width, height> place_word(
-            board<width, height>, std::string, direction<width, height>, pos);
-    static std::pair<bool, board<width, height>> generate_word_search(
-            board<width, height>, std::vector<std::pair<std::string, bool>>);
+    static std::vector<dir_and_pos<width, height>> find_places_for_word(
+            board<width, height>, std::string);
+    static atn::generate_result<width, height> place_word(
+            board<width, height>, std::string, direction<width, height>, pos, std::vector<atn::placed_word>);
+    static atn::generate_result<width, height> generate_word_search(
+            board<width, height>, std::vector<atn::placed_word>, size_t);
     static std::vector<std::string> remove_duplicates(
             std::vector<std::string>);
     static void check_word_lengths(std::vector<std::string>);
     static std::vector<std::string> to_upper(std::vector<std::string>);
     void fill_empty_spots();
-    std::string get_word(const pos&, const pos&) const;
-    void check_won();
   public:
     int seed;
-    std::vector<std::pair<std::string, bool>> word_bank;
+    std::vector<std::string> word_bank;
     board<width, height> puzzle;
-    board<width, height> solution;
+    std::vector<atn::placed_word> solution;
     bool won;
     explicit word_search(int, std::vector<std::string>);
     char at(const pos&) const;
-    bool check_selection(const pos&, const pos&);
-    bool get_won() const;
-    std::string to_string() const;
 };
 
 // ============================================================================
@@ -111,9 +131,9 @@ int word_search<width, height>::_rand(int i) {
 
 template<size_t width, size_t height>
 bool word_search<width, height>::_comp(
-        std::pair<std::string, bool>& str1,
-        std::pair<std::string, bool>& str2) {
-    return str1.first.size() > str2.first.size();
+        atn::placed_word& str1,
+        atn::placed_word& str2) {
+    return str1.word.size() > str2.word.size();
 }
 
 // ============================================================================
@@ -151,16 +171,17 @@ bool word_search<width, height>::check_word(
 // Finds all of the possible positions for a word to go in with a specific
 // direction
 template<size_t width, size_t height>
-std::vector<pos> word_search<width, height>::find_places_for_word(
+std::vector<dir_and_pos<width, height>> word_search<width, height>::find_places_for_word(
         board<width, height> puzzle,
-        std::string word,
-        direction<width, height> dir) {
-    std::vector<pos> result;
-    for (size_t x = dir.start_x(word); x < dir.end_x(word); ++x) {
-        for (size_t y = dir.start_y(word); y < dir.end_y(word); ++y) {
-            if (word_search<width, height>::check_word(
-                    puzzle, word, dir, pos{x, y})) {
-                result.emplace_back(pos{x, y});
+        std::string word) {
+    std::vector<dir_and_pos<width, height>> result;
+    for (auto dir : directions<width, height>) {
+        for (size_t x = dir.start_x(word); x < dir.end_x(word); ++x) {
+            for (size_t y = dir.start_y(word); y < dir.end_y(word); ++y) {
+                if (word_search<width, height>::check_word(
+                        puzzle, word, dir, pos{x, y})) {
+                    result.emplace_back(dir_and_pos<width, height>{dir, pos{x, y}});
+                }
             }
         }
     }
@@ -171,60 +192,51 @@ std::vector<pos> word_search<width, height>::find_places_for_word(
 
 // Places a word at a specific direction and position
 template<size_t width, size_t height>
-board<width, height> word_search<width, height>::place_word(
+atn::generate_result<width, height> word_search<width, height>::place_word(
         board<width, height> puzzle, std::string word,
         direction<width, height> dir,
-        pos p) {
-    for (size_t i = 0, x_curr = p.x, y_curr = p.y;
+        pos p, std::vector<atn::placed_word> placed_words) {
+    size_t i, x_curr, y_curr;
+    for (i = 0, x_curr = p.x, y_curr = p.y;
             i < word.size();
             ++i, x_curr += dir.dx, y_curr += dir.dy) {
         puzzle[x_curr][y_curr] = word[i];
     }
-    return puzzle;
+    for (size_t i = 0; i < placed_words.size(); ++i) {
+        if (placed_words[i].word == word) {
+            placed_words[i].placed = true;
+            placed_words[i].start_x = p.x;
+            placed_words[i].start_y = p.y;
+            placed_words[i].end_x = x_curr - dir.dx;
+            placed_words[i].end_y = y_curr - dir.dy;
+        }
+    }
+    return {false, puzzle, placed_words};
 }
 
 // ============================================================================
 
 // Recursive method for generating a word search
 template<size_t width, size_t height>
-std::pair<bool, board<width, height>> word_search<width, height>::generate_word_search(
+generate_result<width, height> word_search<width, height>::generate_word_search(
         board<width, height> puzzle,
-        std::vector<std::pair<std::string, bool>> placed_words) {
-    bool all_words_placed = true;
-    for (auto word_pair : placed_words) {
-        all_words_placed &= word_pair.second;
-    }
-    if (all_words_placed)
-        return std::make_pair(true, puzzle);
-    for (size_t i = 0; i < placed_words.size(); ++i) {
-        if (placed_words[i].second)
-            continue;
-        std::string word = placed_words[i].first;
-        std::random_shuffle(
-                directions<width, height>.begin(),
-                directions<width, height>.end(),
-                word_search<width, height>::_rand);
-        for (auto dir : directions<width, height>) {
-            auto poses = word_search<width, height>::find_places_for_word(
-                    puzzle, word, dir);
-            std::random_shuffle(poses.begin(), poses.end(),
-                    word_search<width, height>::_rand);
-            for (pos p : poses) {
-                auto placed_words_copy = placed_words;
-                board<width, height> new_puzzle = 
-                        word_search<width, height>::place_word(
-                                puzzle, word, dir, p);
-                placed_words_copy[i].second = true;
-                auto puzzle_pair = 
-                        word_search<width, height>::generate_word_search(
-                                new_puzzle, placed_words_copy);
-                if (puzzle_pair.first) {
-                    return puzzle_pair;
-                }
-            }
+        std::vector<atn::placed_word> placed_words, size_t index) {
+    if (index >= placed_words.size()) return {true, puzzle, placed_words};
+    std::string word = placed_words[index].word;
+    auto positions = word_search<width, height>::find_places_for_word(puzzle, word);
+    std::random_shuffle(positions.begin(), positions.end(), word_search<width, height>::_rand);
+    for (auto position : positions) {
+        auto place_result = word_search<width, height>::place_word(puzzle, word, position.dir, position.p, placed_words);
+        auto placed_words_copy = place_result.placed_words;
+        auto new_puzzle = place_result.puzzle;
+        auto result = 
+                word_search<width, height>::generate_word_search(
+                        new_puzzle, placed_words_copy, index + 1);
+        if (result.success) {
+            return result;
         }
     }
-    return std::make_pair(false, puzzle);
+    return { false, puzzle, placed_words };
 }
 
 // ============================================================================
@@ -277,38 +289,6 @@ void word_search<width, height>::fill_empty_spots() {
 
 // ============================================================================
 
-template<size_t width, size_t height>
-std::string word_search<width, height>::get_word(
-    const pos& p1, const pos& p2) const {
-    int dx = p2.x - p1.x;
-    int dy = p2.y - p1.y;
-    if (dx != 0) {
-        dx /= abs(dx);
-    }
-    if (dy != 0) {
-        dy /= abs(dy);
-    }
-    std::string ret;
-    for (pos p = p1; p.x != p2.x || p.y != p2.y; p.x += dx, p.y += dy) {
-        ret += this->puzzle[p.x][p.y];
-    }
-    ret += this->puzzle[p2.x][p2.y];
-    return ret;
-}
-
-// ============================================================================
-
-template<size_t width, size_t height>
-void word_search<width, height>::check_won() {
-    bool res = true;
-    for (std::pair<std::string, bool> word_found_pair : this->word_bank) {
-        res &= word_found_pair.second;
-    }
-    this->won = res;
-}
-
-// ============================================================================
-
 // Constructor
 template<size_t width, size_t height>
 word_search<width, height>::word_search(
@@ -317,23 +297,22 @@ word_search<width, height>::word_search(
     srand(seed);
     word_bank = this->remove_duplicates(word_bank); // Remove duplicates
     this->check_word_lengths(word_bank); // Check word lengths
-    word_bank = this->to_upper(word_bank); // Convert strings to uppercase
+    this->word_bank = this->to_upper(word_bank); // Convert strings to uppercase
     this->puzzle.fill({}); // Initialize blank puzzle
-    std::vector<std::pair<std::string, bool>> placed_words;
+    std::vector<atn::placed_word> placed_words;
     for (auto str : word_bank) {
-        placed_words.emplace_back(std::make_pair(str, false));
+        placed_words.emplace_back(atn::placed_word{str, false, 0, 0, 0, 0});
     }
-    this->word_bank = placed_words;
     std::sort(placed_words.begin(),
             placed_words.end(),
             word_search<width, height>::_comp);
     auto result = word_search<width, height>::generate_word_search(
-            this->puzzle, placed_words); // Place words in puzzle
-    if (!result.first) {
+            this->puzzle, placed_words, 0); // Place words in puzzle
+    if (!result.success) {
         throw std::runtime_error("ERROR: No valid puzzles found.");
     }
-    this->puzzle = result.second;
-    this->solution = this->puzzle;
+    this->puzzle = result.puzzle;
+    this->solution = result.placed_words;
     this->fill_empty_spots(); // Fill in empty slots
 }
 
@@ -342,62 +321,6 @@ word_search<width, height>::word_search(
 template<size_t width, size_t height>
 char word_search<width, height>::at(const pos& p) const {
     return this->puzzle[p.x][p.y];
-}
-
-// ============================================================================
-
-template<size_t width, size_t height>
-bool word_search<width, height>::check_selection(
-        const pos& p1, const pos& p2) {
-    std::string selected_word = word_search<width, height>::get_word(p1, p2);
-    std::string rev_selected_word(
-            selected_word.rbegin(), selected_word.rend());
-    for (size_t i = 0; i < this->word_bank.size(); ++i) {
-        if ((this->word_bank[i].first == selected_word
-                || this->word_bank[i].first == rev_selected_word)
-                && !this->word_bank[i].second) { // This is a redundant check to ensure that if duplicates are in the word search they can all be found
-            this->word_bank[i].second = true;
-            this->check_won();
-            return true;
-        }
-    }
-    return false;
-}
-
-// ============================================================================
-
-template<size_t width, size_t height>
-bool word_search<width, height>::get_won() const {
-    return this->won;
-}
-
-// ============================================================================
-
-// Simple to_string
-template<size_t width, size_t height>
-std::string word_search<width, height>::to_string() const {
-    std::string str;
-    str += "Puzzle:\n";
-    for (size_t y = 0; y < height; ++y) {
-        for (size_t x = 0; x < width; ++x) {
-            str += (this->puzzle[x][y] + std::string(" "));
-        }
-        str += "\n\n";
-    }
-    str += "Word Bank:\n";
-    for (auto word : this->word_bank) {
-        str += (word.first + "\n");
-    }
-    str += ("\nSeed: " + std::to_string(this->seed) + "\n\n");
-    str += "Sloution: \n";
-    for (size_t y = 0; y < height; ++y) {
-        for (size_t x = 0; x < width; ++x) {
-            str += (this->solution[x][y] == EMPTY_CHAR ?
-                    ' ' : this->solution[x][y]);
-        }
-        str += "\n";
-    }
-    return str;
 }
 
 // ============================================================================
